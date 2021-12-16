@@ -115,12 +115,17 @@ type ResourceOptionsWithFullTextSearch = {
 export type ResourceOptions = string[] | ResourceOptionsWithFullTextSearch;
 export type ResourcesOptions = Record<string, ResourceOptions>;
 
+export type PostgrestFilterBuilder = (
+    arg0: PostgrestFilterBuilder
+) => PostgrestFilterBuilder;
+
 const getList = async ({ client, resources, resource, params }) => {
     const {
         pagination,
         sort,
         filter: { q, ...filter },
     } = params;
+    console.log('getList', resource);
 
     const resourceOptions = resources[resource];
     const fields = Array.isArray(resourceOptions)
@@ -130,12 +135,33 @@ const getList = async ({ client, resources, resource, params }) => {
     const rangeFrom = (pagination.page - 1) * pagination.perPage;
     const rangeTo = rangeFrom + pagination.perPage;
 
+    const filterSafe = filter || {};
+
+    const customFilterQuery = filterSafe.customFilterQuery;
+    delete filterSafe.customFilterQuery;
+
     let query = client
         .from(resource)
         .select(fields.join(', '), { count: 'exact' })
         .order(sort.field, { ascending: sort.order === 'ASC' })
         .match(filter)
         .range(rangeFrom, rangeTo);
+
+    console.warn('filter', Object.keys(filter));
+    for (var key in filter) {
+        if (key.endsWith('.gte')) {
+            console.log('found .gte', filter[key]);
+            query = query.gte(key.replace('.gte', ''), filter[key]);
+        }
+        if (key.endsWith('.lte')) {
+            console.log('found .lte', filter[key]);
+            query = query.lte(key.replace('.lte', ''), filter[key]);
+        }
+    }
+    if (customFilterQuery) {
+        console.info('customFilterQuery', customFilterQuery);
+        query = query.or(`${customFilterQuery}`);
+    }
 
     if (q) {
         const fullTextSearchFields = Array.isArray(resourceOptions)
