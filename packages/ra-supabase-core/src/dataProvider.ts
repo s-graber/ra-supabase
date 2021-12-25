@@ -125,7 +125,6 @@ const getList = async ({ client, resources, resource, params }) => {
         sort,
         filter: { q, ...filter },
     } = params;
-    console.log('getList', resource);
 
     const resourceOptions = resources[resource];
     const fields = Array.isArray(resourceOptions)
@@ -140,24 +139,44 @@ const getList = async ({ client, resources, resource, params }) => {
     const customFilterQuery = filterSafe.customFilterQuery;
     delete filterSafe.customFilterQuery;
 
+    console.info('fields', fields);
+    const cleansedFields = [];
+    for (var k of fields) {
+        if (k.endsWith('_gte') || k.endsWith('_lte')) {
+            console.info('found field ≥≤', k);
+            cleansedFields.push(k.replace('_gte', '').replace('_lte', ''));
+        } else {
+            cleansedFields.push(k);
+        }
+    }
+    const cleansedFieldsWithoutDuplicate = cleansedFields.filter(
+        (item, pos, self) => self.indexOf(item) === pos
+    );
+    console.info('cleansedFields', cleansedFieldsWithoutDuplicate);
+    for (var filterKey in filter) {
+        if (filterKey.endsWith('_gte') || filterKey.endsWith('_lte')) {
+            delete filter[filterKey];
+        }
+    }
     let query = client
         .from(resource)
-        .select(fields.join(', '), { count: 'exact' })
+        .select(cleansedFieldsWithoutDuplicate.join(', '), { count: 'exact' })
         .order(sort.field, { ascending: sort.order === 'ASC' })
         .match(filter)
         .range(rangeFrom, rangeTo);
 
-    console.warn('filter', Object.keys(filter));
+    console.info('filter', filter);
     for (var key in filter) {
-        if (key.endsWith('.gte')) {
-            console.log('found .gte', filter[key]);
-            query = query.gte(key.replace('.gte', ''), filter[key]);
+        if (key.endsWith('_gte')) {
+            console.info('found ≥', filter[key]);
+            query = query.gte(key.replace('_gte', ''), filter[key]);
         }
-        if (key.endsWith('.lte')) {
-            console.log('found .lte', filter[key]);
-            query = query.lte(key.replace('.lte', ''), filter[key]);
+        if (key.endsWith('_lte')) {
+            console.info('found ≤', filter[key]);
+            query = query.lte(key.replace('_lte', ''), filter[key]);
         }
     }
+    console.info('query', query);
     if (customFilterQuery) {
         console.info('customFilterQuery', customFilterQuery);
         query = query.or(`${customFilterQuery}`);
