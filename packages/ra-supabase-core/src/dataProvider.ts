@@ -132,7 +132,7 @@ const getList = async ({ client, resources, resource, params }) => {
         : resourceOptions.fields;
 
     const rangeFrom = (pagination.page - 1) * pagination.perPage;
-    const rangeTo = rangeFrom + pagination.perPage;
+    const rangeTo = rangeFrom + pagination.perPage - 1;
 
     const filterSafe = filter || {};
 
