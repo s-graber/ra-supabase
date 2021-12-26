@@ -61,6 +61,7 @@ export const supabaseDataProvider = (
         return { data: record };
     },
     update: async (resource, { id, data }) => {
+        data.lastupdate = new Date();
         const { data: record, error } = await client
             .from(resource)
             .update(data)
@@ -73,6 +74,7 @@ export const supabaseDataProvider = (
         return { data: record };
     },
     updateMany: async (resource, { ids, data }) => {
+        data.lastupdate = new Date();
         const { data: records, error } = await client
             .from(resource)
             .update(data)
