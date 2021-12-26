@@ -139,7 +139,7 @@ const getList = async ({ client, resources, resource, params }) => {
     const customFilterQuery = filterSafe.customFilterQuery;
     delete filterSafe.customFilterQuery;
 
-    console.info('fields', fields);
+    // console.info('fields', fields);
     const cleansedFields = [];
     for (var k of fields) {
         if (k.endsWith('_gte') || k.endsWith('_lte')) {
@@ -152,7 +152,7 @@ const getList = async ({ client, resources, resource, params }) => {
     const cleansedFieldsWithoutDuplicate = cleansedFields.filter(
         (item, pos, self) => self.indexOf(item) === pos
     );
-    console.info('cleansedFields', cleansedFieldsWithoutDuplicate);
+    // console.info('cleansedFields', cleansedFieldsWithoutDuplicate);
     for (var filterKey in filter) {
         if (filterKey.endsWith('_gte') || filterKey.endsWith('_lte')) {
             delete filter[filterKey];
@@ -165,20 +165,20 @@ const getList = async ({ client, resources, resource, params }) => {
         .match(filter)
         .range(rangeFrom, rangeTo);
 
-    console.info('filter', filter);
+    // console.info('filter', filter);
     for (var key in filter) {
         if (key.endsWith('_gte')) {
-            console.info('found ≥', filter[key]);
+            // console.info('found ≥', filter[key]);
             query = query.gte(key.replace('_gte', ''), filter[key]);
         }
         if (key.endsWith('_lte')) {
-            console.info('found ≤', filter[key]);
+            // console.info('found ≤', filter[key]);
             query = query.lte(key.replace('_lte', ''), filter[key]);
         }
     }
-    console.info('query', query);
+
     if (customFilterQuery) {
-        console.info('customFilterQuery', customFilterQuery);
+        // console.info('customFilterQuery', customFilterQuery);
         query = query.or(`${customFilterQuery}`);
     }
 
