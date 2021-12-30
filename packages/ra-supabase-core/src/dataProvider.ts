@@ -1,9 +1,11 @@
-import { DataProvider } from 'ra-core';
+import { DataProvider, AuthProvider } from 'ra-core';
 import { SupabaseClient } from '@supabase/supabase-js';
+import jwt_decode from 'jwt-decode';
 
 export const supabaseDataProvider = (
     client: SupabaseClient,
-    resources: ResourcesOptions
+    resources: ResourcesOptions,
+    authProvider: AuthProvider
 ): DataProvider => ({
     getList: async (resource, params) => {
         return getList({ client, resources, resource, params });
@@ -50,6 +52,11 @@ export const supabaseDataProvider = (
         return getList({ client, resources, resource, params });
     },
     create: async (resource, { data }) => {
+        const { email } = jwt_decode(await authProvider.getJWTToken());
+        data.createdate = new Date();
+        if (email) {
+            data.createdby = email;
+        }
         const { data: record, error } = await client
             .from(resource)
             .insert(data)
@@ -61,7 +68,11 @@ export const supabaseDataProvider = (
         return { data: record };
     },
     update: async (resource, { id, data }) => {
+        const { email } = jwt_decode(await authProvider.getJWTToken());
         data.lastupdate = new Date();
+        if (email) {
+            data.updatedby = email;
+        }
         const { data: record, error } = await client
             .from(resource)
             .update(data)
@@ -74,7 +85,11 @@ export const supabaseDataProvider = (
         return { data: record };
     },
     updateMany: async (resource, { ids, data }) => {
+        const { email } = jwt_decode(await authProvider.getJWTToken());
         data.lastupdate = new Date();
+        if (email) {
+            data.updatedby = email;
+        }
         const { data: records, error } = await client
             .from(resource)
             .update(data)
@@ -160,6 +175,7 @@ const getList = async ({ client, resources, resource, params }) => {
             delete filter[filterKey];
         }
     }
+    // console.log('filter', filter);
     let query = client
         .from(resource)
         .select(cleansedFieldsWithoutDuplicate.join(', '), { count: 'exact' })
