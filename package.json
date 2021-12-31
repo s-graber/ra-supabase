@@ -2,7 +2,7 @@
     "name": "ra-supabase",
     "private": true,
     "version": "1.0.0",
-    "repository": "git@github.com:marmelab/ra-supabase.git",
+    "repository": "git@github.com:s-graber/ra-supabase.git",
     "author": "Gildas Garcia <1122076+djhi@users.noreply.github.com>",
     "license": "MIT",
     "files": [

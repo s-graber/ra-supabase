@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { useRedirectIfAuthenticated } from 'ra-supabase-core';
+import { useRedirectIfAuthenticated } from '@s-graber/ra-supabase-core';
 import { AuthLayout } from './AuthLayout';
 import { LoginForm } from './LoginForm';
 

@@ -28,7 +28,7 @@ import { createClient } from '@supabase/supabase-js';
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // in dataProvider.js
-import { supabaseDataProvider } from 'ra-supabase';
+import { supabaseDataProvider } from '@s-graber/ra-supabase';
 import { supabase } from './supabase';
 
 const resources = {
@@ -39,7 +39,7 @@ const resources = {
 export const dataProvider = supabaseDataProvider(supabase, resources);
 
 // in authProvider.js
-import { supabaseAuthProvider } from 'ra-supabase';
+import { supabaseAuthProvider } from '@s-graber/ra-supabase';
 import { supabase } from './supabase';
 
 export const authProvider = supabaseAuthProvider(supabase, {
@@ -63,7 +63,7 @@ export const authProvider = supabaseAuthProvider(supabase, {
 
 // in App.js
 import { Admin, Resource, ListGuesser } from 'react-admin';
-import { authRoutes } from 'ra-supabase';
+import { authRoutes } from '@s-graber/ra-supabase';
 import { dataProvider } from './dataProvider';
 import { authProvider } from './authProvider';
 
@@ -94,8 +94,8 @@ import { mergeTranslations } from 'ra-core';
 import polyglotI18nProvider from 'ra-i18n-polyglot';
 import englishMessages from 'ra-language-english';
 import frenchMessages from 'ra-language-french';
-import { raSupabaseEnglishMessages } from 'ra-supabase-language-english';
-import { raSupabaseFrenchMessages } from 'ra-supabase-language-french';
+import { raSupabaseEnglishMessages } from '@s-graber/ra-supabase-language-english';
+import { raSupabaseFrenchMessages } from '@s-graber/ra-supabase-language-french';
 
 const allEnglishMessages = mergeTranslations(
     englishMessages,
@@ -113,7 +113,7 @@ export const i18nProvider = polyglotI18nProvider(
 
 // in App.js
 import { Admin, Resource, ListGuesser } from 'react-admin';
-import { authRoutes } from 'ra-supabase';
+import { authRoutes } from '@s-graber/ra-supabase';
 import { dataProvider } from './dataProvider';
 import { authProvider } from './authProvider';
 import { i18nProvider } from './i18nProvider';
@@ -142,7 +142,7 @@ Instead of passing an array of fields for each resource, you can pass an object 
 
 ```js
 // in dataProvider.js
-import { supabaseDataProvider } from 'ra-supabase';
+import { supabaseDataProvider } from '@s-graber/ra-supabase';
 import { supabase } from './supabase';
 
 const resources = {

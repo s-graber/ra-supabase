@@ -18,7 +18,7 @@ import { createClient } from '@supabase/supabase-js';
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // in dataProvider.js
-import { supabaseDataProvider } from 'ra-supabase';
+import { supabaseDataProvider } from '@s-graber/ra-supabase';
 import { supabase } from './supabase';
 
 const resources = {
@@ -29,7 +29,7 @@ const resources = {
 export const dataProvider = supabaseDataProvider(supabase, resources);
 
 // in authProvider.js
-import { supabaseAuthProvider } from 'ra-supabase';
+import { supabaseAuthProvider } from '@s-graber/ra-supabase';
 import { supabase } from './supabase';
 
 export const authProvider = supabaseAuthProvider(supabase, {
@@ -53,7 +53,7 @@ export const authProvider = supabaseAuthProvider(supabase, {
 
 // in App.js
 import { Admin, Resource, ListGuesser } from 'react-admin';
-import { authRoutes } from 'ra-supabase';
+import { authRoutes } from '@s-graber/ra-supabase';
 import { dataProvider } from './dataProvider';
 import { authProvider } from './authProvider';
 
@@ -97,7 +97,10 @@ It accepts an `onSuccess` and `onFailure` props just like the hook:
 
 ```jsx
 import { useLogout, useNotify, useRedirect } from 'react-admin';
-import { SetPasswordPage, SetPasswordForm } from 'ra-supabase-ui-materialui';
+import {
+    SetPasswordPage,
+    SetPasswordForm,
+} from '@s-graber/ra-supabase-ui-materialui';
 
 const MySetPasswordPage = () => {
     const logout = useLogout();

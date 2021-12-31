@@ -11,7 +11,7 @@ import { createClient } from '@supabase/supabase-js';
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // in dataProvider.js
-import { supabaseDataProvider } from 'ra-supabase-core';
+import { supabaseDataProvider } from '@s-graber/ra-supabase-core';
 import { supabase } from './supabase';
 
 const resources = {
@@ -22,7 +22,7 @@ const resources = {
 export const dataProvider = supabaseDataProvider(supabase, resources);
 
 // in authProvider.js
-import { supabaseAuthProvider } from 'ra-supabase-core';
+import { supabaseAuthProvider } from '@s-graber/ra-supabase-core';
 import { supabase } from './supabase';
 
 export const authProvider = supabaseAuthProvider(supabase, {
@@ -75,7 +75,7 @@ The `supabaseDataProvider` must be initialized with your supabase client and an 
 
 ```jsx
 // in dataProvider.js
-import { supabaseDataProvider } from 'ra-supabase-core';
+import { supabaseDataProvider } from '@s-graber/ra-supabase-core';
 import { supabase } from './supabase';
 
 const resources = {
@@ -97,7 +97,7 @@ Instead of passing an array of fields for each resource, you can pass an object 
 
 ```js
 // in dataProvider.js
-import { supabaseDataProvider } from 'ra-supabase';
+import { supabaseDataProvider } from '@s-graber/ra-supabase';
 import { supabase } from './supabase';
 
 const resources = {
@@ -120,7 +120,7 @@ The `supabaseAuthProvider` must be initialized with your supabase client and an 
 
 ```jsx
 // in authProvider.js
-import { supabaseAuthProvider } from 'ra-supabase-core';
+import { supabaseAuthProvider } from '@s-graber/ra-supabase-core';
 import { supabase } from './supabase';
 
 export const authProvider = supabaseAuthProvider(supabase, {
@@ -155,7 +155,7 @@ access token parameter to look for in the URL can also be overridden (`access_to
 This is useful in pages related to authentication such as one which would allow invited users to set their password.
 
 ```jsx
-import { useSupabaseAccessToken } from 'ra-supabase-core';
+import { useSupabaseAccessToken } from '@s-graber/ra-supabase-core';
 
 const SetPasswordPage = () => {
     const access_token = useSupabaseAccessToken();
@@ -172,7 +172,7 @@ This hook returns a function you can call to set the current user password. The 
 -   `onFailure`: A function called when the set password operation fails. By default, it display an error notification.
 
 ```jsx
-import { useSupabaseAccessToken } from 'ra-supabase-core';
+import { useSupabaseAccessToken } from '@s-graber/ra-supabase-core';
 
 const SetPasswordPage = () => {
     const access_token = useSupabaseAccessToken();

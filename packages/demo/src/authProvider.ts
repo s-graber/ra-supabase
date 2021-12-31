@@ -1,4 +1,4 @@
-import { supabaseAuthProvider } from 'ra-supabase';
+import { supabaseAuthProvider } from '@s-graber/ra-supabase';
 import { Record } from 'react-admin';
 import { supabase } from './supabase';
 

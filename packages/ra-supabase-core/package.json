@@ -1,7 +1,7 @@
 {
-    "name": "ra-supabase-core",
+    "name": "@s-graber/ra-supabase-core",
     "version": "1.1.2",
-    "repository": "git@github.com:marmelab/ra-supabase.git",
+    "repository": "git@github.com:s-graber/ra-supabase.git",
     "author": "Gildas Garcia <1122076+djhi@users.noreply.github.com>",
     "license": "MIT",
     "files": [
@@ -44,5 +44,9 @@
     },
     "jest": {
         "testEnvironment": "jsdom"
+    },
+    "dependencies": {
+        "@types/jwt-decode": "^3.1.0",
+        "jwt-decode": "^3.1.2"
     }
 }

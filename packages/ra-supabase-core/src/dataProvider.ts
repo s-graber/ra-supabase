@@ -52,11 +52,13 @@ export const supabaseDataProvider = (
         return getList({ client, resources, resource, params });
     },
     create: async (resource, { data }) => {
-        const { email } = jwt_decode(await authProvider.getJWTToken());
-        data.createdate = new Date();
-        if (email) {
-            data.createdby = email;
+        const decoded: { email: string } = jwt_decode(
+            await authProvider.getJWTToken()
+        );
+        if (decoded && decoded.email) {
+            data.createdby = decoded.email;
         }
+        data.createdate = new Date();
         const { data: record, error } = await client
             .from(resource)
             .insert(data)
@@ -68,10 +70,11 @@ export const supabaseDataProvider = (
         return { data: record };
     },
     update: async (resource, { id, data }) => {
-        const { email } = jwt_decode(await authProvider.getJWTToken());
-        data.lastupdate = new Date();
-        if (email) {
-            data.updatedby = email;
+        const decoded: { email: string } = jwt_decode(
+            await authProvider.getJWTToken()
+        );
+        if (decoded && decoded.email) {
+            data.createdby = decoded.email;
         }
         const { data: record, error } = await client
             .from(resource)
@@ -85,10 +88,11 @@ export const supabaseDataProvider = (
         return { data: record };
     },
     updateMany: async (resource, { ids, data }) => {
-        const { email } = jwt_decode(await authProvider.getJWTToken());
-        data.lastupdate = new Date();
-        if (email) {
-            data.updatedby = email;
+        const decoded: { email: string } = jwt_decode(
+            await authProvider.getJWTToken()
+        );
+        if (decoded && decoded.email) {
+            data.createdby = decoded.email;
         }
         const { data: records, error } = await client
             .from(resource)

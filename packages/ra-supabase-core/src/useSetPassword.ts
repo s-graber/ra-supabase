@@ -11,7 +11,7 @@ import { SetPasswordParams, SupabaseAuthProvider } from './authProvider';
  * This hook returns a function to call in order to set a user password on Supabase.
  *
  * @example
- * import { useSupabaseAccessToken } from 'ra-supabase-core';
+ * import { useSupabaseAccessToken } from '@s-graber/ra-supabase-core';
  *
  * const SetPasswordPage = () => {
  *     const access_token = useSupabaseAccessToken();

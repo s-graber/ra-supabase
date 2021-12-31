@@ -6,7 +6,7 @@ import { useEffect } from 'react';
  * To be used in pages such as those which set the password after a reset or an invitation.
  *
  * @example
- * import { useSupabaseAccessToken } from 'ra-supabase-core';
+ * import { useSupabaseAccessToken } from '@s-graber/ra-supabase-core';
  *
  * const SetPasswordPage = () => {
  *     const access_token = useSupabaseAccessToken();

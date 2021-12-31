@@ -1,4 +1,4 @@
-import { ResourcesOptions, supabaseDataProvider } from 'ra-supabase';
+import { ResourcesOptions, supabaseDataProvider } from '@s-graber/ra-supabase';
 import { supabase } from './supabase';
 
 const resources: ResourcesOptions = {
