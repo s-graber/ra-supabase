@@ -49,6 +49,7 @@ export const supabaseDataProvider = (
             ...originalParams,
             filter: { ...originalParams.filter, [target]: id },
         };
+        // console.log('getManyReference', params.filter);
         return getList({ client, resources, resource, params });
     },
     create: async (resource, { data }) => {
@@ -159,12 +160,11 @@ const getList = async ({ client, resources, resource, params }) => {
 
     const customFilterQuery = filterSafe.customFilterQuery;
     delete filterSafe.customFilterQuery;
+    const matchFilter = { ...filter };
 
-    // console.info('fields', fields);
     const cleansedFields = [];
     for (var k of fields) {
         if (k.endsWith('_gte') || k.endsWith('_lte')) {
-            console.info('found field ≥≤', k);
             cleansedFields.push(k.replace('_gte', '').replace('_lte', ''));
         } else {
             cleansedFields.push(k);
@@ -173,13 +173,12 @@ const getList = async ({ client, resources, resource, params }) => {
     const cleansedFieldsWithoutDuplicate = cleansedFields.filter(
         (item, pos, self) => self.indexOf(item) === pos
     );
-    // console.info('cleansedFields', cleansedFieldsWithoutDuplicate);
+
     for (var filterKey in filter) {
         if (filterKey.endsWith('_gte') || filterKey.endsWith('_lte')) {
             delete filter[filterKey];
         }
     }
-    // console.log('filter', filter);
     let query = client
         .from(resource)
         .select(cleansedFieldsWithoutDuplicate.join(', '), { count: 'exact' })
@@ -187,15 +186,14 @@ const getList = async ({ client, resources, resource, params }) => {
         .match(filter)
         .range(rangeFrom, rangeTo);
 
-    // console.info('filter', filter);
-    for (var key in filter) {
+    for (var key in matchFilter) {
         if (key.endsWith('_gte')) {
-            // console.info('found ≥', filter[key]);
-            query = query.gte(key.replace('_gte', ''), filter[key]);
+            // console.info('matchFilter found ≥', key, matchFilter[key]);
+            query = query.gte(key.replace('_gte', ''), matchFilter[key]);
         }
         if (key.endsWith('_lte')) {
-            // console.info('found ≤', filter[key]);
-            query = query.lte(key.replace('_lte', ''), filter[key]);
+            // console.info('matchFilter found ≤', key, matchFilter[key]);
+            query = query.lte(key.replace('_lte', ''), matchFilter[key]);
         }
     }
 
@@ -215,6 +213,15 @@ const getList = async ({ client, resources, resource, params }) => {
     }
 
     const { data, error, count } = await query;
+
+    // if (resource === 'trainings')
+    //     console.log('query', {
+    //         cleansedFieldsWithoutDuplicate,
+    //         filter,
+    //         matchFilter,
+    //         data,
+    //         count,
+    //     });
 
     if (error) {
         throw error;
