@@ -164,8 +164,21 @@ const getList = async ({ client, resources, resource, params }) => {
 
     const cleansedFields = [];
     for (var k of fields) {
-        if (k.endsWith('_gte') || k.endsWith('_lte')) {
-            cleansedFields.push(k.replace('_gte', '').replace('_lte', ''));
+        if (
+            k.endsWith('_gte') ||
+            k.endsWith('_lte') ||
+            k.endsWith('_neq') ||
+            k.endsWith('_is_not') ||
+            k.endsWith('_is')
+        ) {
+            cleansedFields.push(
+                k
+                    .replace('_gte', '')
+                    .replace('_lte', '')
+                    .replace('_is_not', '')
+                    .replace('_neq', '')
+                    .replace('_is', '')
+            );
         } else {
             cleansedFields.push(k);
         }
@@ -175,7 +188,13 @@ const getList = async ({ client, resources, resource, params }) => {
     );
 
     for (var filterKey in filter) {
-        if (filterKey.endsWith('_gte') || filterKey.endsWith('_lte')) {
+        if (
+            filterKey.endsWith('_gte') ||
+            filterKey.endsWith('_lte') ||
+            filterKey.endsWith('_is_not') ||
+            filterKey.endsWith('_is') ||
+            filterKey.endsWith('_neq')
+        ) {
             delete filter[filterKey];
         }
     }
@@ -194,6 +213,21 @@ const getList = async ({ client, resources, resource, params }) => {
         if (key.endsWith('_lte')) {
             // console.info('matchFilter found ≤', key, matchFilter[key]);
             query = query.lte(key.replace('_lte', ''), matchFilter[key]);
+        }
+        if (key.endsWith('_neq')) {
+            console.info('matchFilter found !=', key, matchFilter[key]);
+            query = query.neq(key.replace('_neq', ''), matchFilter[key]);
+        }
+        if (key.endsWith('_is_not')) {
+            console.info('matchFilter found is_not', key, matchFilter[key]);
+            query = query.not(
+                key.replace('_is_not', ''),
+                'is',
+                matchFilter[key]
+            );
+        } else if (key.endsWith('_is')) {
+            console.info('matchFilter found is', key, matchFilter[key]);
+            query = query.is(key.replace('_is', ''), matchFilter[key]);
         }
     }
 
@@ -214,14 +248,15 @@ const getList = async ({ client, resources, resource, params }) => {
 
     const { data, error, count } = await query;
 
-    // if (resource === 'trainings')
-    //     console.log('query', {
-    //         cleansedFieldsWithoutDuplicate,
-    //         filter,
-    //         matchFilter,
-    //         data,
-    //         count,
-    //     });
+    // if (resource.contains('training'))
+    console.log('query', {
+        cleansedFieldsWithoutDuplicate,
+        filter,
+        matchFilter,
+        data,
+        count,
+        query,
+    });
 
     if (error) {
         throw error;
