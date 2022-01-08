@@ -5,10 +5,11 @@ import jwt_decode from 'jwt-decode';
 export const supabaseDataProvider = (
     client: SupabaseClient,
     resources: ResourcesOptions,
-    authProvider: AuthProvider
+    authProvider: AuthProvider,
+    logging: boolean
 ): DataProvider => ({
     getList: async (resource, params) => {
-        return getList({ client, resources, resource, params });
+        return getList({ client, resources, resource, params, logging });
     },
     getOne: async (resource, { id }) => {
         const resourceOptions = resources[resource];
@@ -50,7 +51,7 @@ export const supabaseDataProvider = (
             filter: { ...originalParams.filter, [target]: id },
         };
         // console.log('getManyReference', params.filter);
-        return getList({ client, resources, resource, params });
+        return getList({ client, resources, resource, params, logging });
     },
     create: async (resource, { data }) => {
         const decoded: { email: string } = jwt_decode(
@@ -141,7 +142,7 @@ export type PostgrestFilterBuilder = (
     arg0: PostgrestFilterBuilder
 ) => PostgrestFilterBuilder;
 
-const getList = async ({ client, resources, resource, params }) => {
+const getList = async ({ client, resources, resource, params, logging }) => {
     const {
         pagination,
         sort,
@@ -215,18 +216,18 @@ const getList = async ({ client, resources, resource, params }) => {
             query = query.lte(key.replace('_lte', ''), matchFilter[key]);
         }
         if (key.endsWith('_neq')) {
-            console.info('matchFilter found !=', key, matchFilter[key]);
+            // console.info('matchFilter found !=', key, matchFilter[key]);
             query = query.neq(key.replace('_neq', ''), matchFilter[key]);
         }
         if (key.endsWith('_is_not')) {
-            console.info('matchFilter found is_not', key, matchFilter[key]);
+            // console.info('matchFilter found is_not', key, matchFilter[key]);
             query = query.not(
                 key.replace('_is_not', ''),
                 'is',
                 matchFilter[key]
             );
         } else if (key.endsWith('_is')) {
-            console.info('matchFilter found is', key, matchFilter[key]);
+            // console.info('matchFilter found is', key, matchFilter[key]);
             query = query.is(key.replace('_is', ''), matchFilter[key]);
         }
     }
@@ -248,15 +249,16 @@ const getList = async ({ client, resources, resource, params }) => {
 
     const { data, error, count } = await query;
 
-    // if (resource.contains('training'))
-    console.log('query', {
-        cleansedFieldsWithoutDuplicate,
-        filter,
-        matchFilter,
-        data,
-        count,
-        query,
-    });
+    if (logging) {
+        console.log('query', {
+            cleansedFieldsWithoutDuplicate,
+            filter,
+            matchFilter,
+            data,
+            count,
+            query,
+        });
+    }
 
     if (error) {
         throw error;
