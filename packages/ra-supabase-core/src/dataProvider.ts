@@ -5,11 +5,10 @@ import jwt_decode from 'jwt-decode';
 export const supabaseDataProvider = (
     client: SupabaseClient,
     resources: ResourcesOptions,
-    authProvider: AuthProvider,
-    logging: boolean
+    authProvider: AuthProvider
 ): DataProvider => ({
     getList: async (resource, params) => {
-        return getList({ client, resources, resource, params, logging });
+        return getList({ client, resources, resource, params, logging: true });
     },
     getOne: async (resource, { id }) => {
         const resourceOptions = resources[resource];
@@ -51,25 +50,14 @@ export const supabaseDataProvider = (
             filter: { ...originalParams.filter, [target]: id },
         };
         // console.log('getManyReference', params.filter);
-        return getList({ client, resources, resource, params, logging });
+        return getList({ client, resources, resource, params, logging: true });
+    },
+    createMany: async (resource, { data }) => {
+        // console.log('createMany', { data });
+        return create({ client, resource, authProvider, data });
     },
     create: async (resource, { data }) => {
-        const decoded: { email: string } = jwt_decode(
-            await authProvider.getJWTToken()
-        );
-        if (decoded && decoded.email) {
-            data.createdby = decoded.email;
-        }
-        data.createdate = new Date();
-        const { data: record, error } = await client
-            .from(resource)
-            .insert(data)
-            .single();
-
-        if (error) {
-            throw error;
-        }
-        return { data: record };
+        return create({ client, resource, authProvider, data });
     },
     update: async (resource, { id, data }) => {
         const decoded: { email: string } = jwt_decode(
@@ -142,6 +130,27 @@ export type PostgrestFilterBuilder = (
     arg0: PostgrestFilterBuilder
 ) => PostgrestFilterBuilder;
 
+const create = async ({ client, resource, data, authProvider }) => {
+    // console.log('create', { data });
+    const decoded: { email: string } = jwt_decode(
+        await authProvider.getJWTToken()
+    );
+    if (decoded && decoded.email) {
+        data.createdby = decoded.email;
+    }
+    data.createdate = new Date();
+    let { data: record, error } = await client
+        .from(resource)
+        .insert(data)
+        .limit(1)
+        .single();
+
+    if (error) {
+        throw error;
+    }
+    return { data: record };
+};
+
 const getList = async ({ client, resources, resource, params, logging }) => {
     const {
         pagination,
@@ -158,10 +167,9 @@ const getList = async ({ client, resources, resource, params, logging }) => {
     const rangeTo = rangeFrom + pagination.perPage - 1;
 
     const filterSafe = filter || {};
-
     const customFilterQuery = filterSafe.customFilterQuery;
     delete filterSafe.customFilterQuery;
-    const matchFilter = { ...filter };
+    const matchFilter = { ...filterSafe };
 
     const cleansedFields = [];
     for (var k of fields) {
@@ -188,7 +196,7 @@ const getList = async ({ client, resources, resource, params, logging }) => {
         (item, pos, self) => self.indexOf(item) === pos
     );
 
-    for (var filterKey in filter) {
+    for (var filterKey in filterSafe) {
         if (
             filterKey.endsWith('_gte') ||
             filterKey.endsWith('_lte') ||
@@ -196,14 +204,14 @@ const getList = async ({ client, resources, resource, params, logging }) => {
             filterKey.endsWith('_is') ||
             filterKey.endsWith('_neq')
         ) {
-            delete filter[filterKey];
+            delete filterSafe[filterKey];
         }
     }
     let query = client
         .from(resource)
         .select(cleansedFieldsWithoutDuplicate.join(', '), { count: 'exact' })
         .order(sort.field, { ascending: sort.order === 'ASC' })
-        .match(filter)
+        .match(filterSafe)
         .range(rangeFrom, rangeTo);
 
     for (var key in matchFilter) {
@@ -233,7 +241,7 @@ const getList = async ({ client, resources, resource, params, logging }) => {
     }
 
     if (customFilterQuery) {
-        // console.info('customFilterQuery', customFilterQuery);
+        console.info('customFilterQuery', customFilterQuery);
         query = query.or(`${customFilterQuery}`);
     }
 
