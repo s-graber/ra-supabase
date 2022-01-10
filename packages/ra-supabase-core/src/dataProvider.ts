@@ -64,8 +64,9 @@ export const supabaseDataProvider = (
             await authProvider.getJWTToken()
         );
         if (decoded && decoded.email) {
-            data.createdby = decoded.email;
+            data.updatedby = decoded.email;
         }
+        data.lastupdate = new Date();
         const { data: record, error } = await client
             .from(resource)
             .update(data)
@@ -82,7 +83,7 @@ export const supabaseDataProvider = (
             await authProvider.getJWTToken()
         );
         if (decoded && decoded.email) {
-            data.createdby = decoded.email;
+            data.updatedby = decoded.email;
         }
         const { data: records, error } = await client
             .from(resource)
