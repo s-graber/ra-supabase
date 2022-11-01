@@ -57,6 +57,9 @@ export const supabaseDataProvider = (
         return create({ client, resource, authProvider, data });
     },
     create: async (resource, { data }) => {
+        console.log('create', {
+            data,
+        });
         return create({ client, resource, authProvider, data });
     },
     update: async (resource, { id, data }) => {
@@ -67,6 +70,10 @@ export const supabaseDataProvider = (
             data.updatedby = decoded.email;
         }
         data.lastupdate = new Date();
+        console.log('update decoded', {
+            data,
+            decoded,
+        });
         const { data: record, error } = await client
             .from(resource)
             .update(data)
@@ -85,6 +92,10 @@ export const supabaseDataProvider = (
         if (decoded && decoded.email) {
             data.updatedby = decoded.email;
         }
+        console.log('updateMany', {
+            data,
+            decoded,
+        });
         const { data: records, error } = await client
             .from(resource)
             .update(data)
