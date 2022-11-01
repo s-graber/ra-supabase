@@ -1,6 +1,6 @@
 {
     "name": "@s-graber/ra-supabase-ui-materialui",
-    "version": "1.1.4",
+    "version": "1.1.5",
     "repository": "git@github.com:s-graber/ra-supabase.git",
     "author": "Gildas Garcia <1122076+djhi@users.noreply.github.com>",
     "license": "MIT",
@@ -15,7 +15,7 @@
     "types": "esm/index.d.ts",
     "sideEffects": false,
     "dependencies": {
-        "@s-graber/ra-supabase-core": "^1.1.4"
+        "@s-graber/ra-supabase-core": "^1.1.5"
     },
     "devDependencies": {
         "@material-ui/core": "^4.11.2",
